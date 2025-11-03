@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design System CSS Variables */
+@layer base {
+  :root {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F7F7F9;
+    --bg-inverse: #121212;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --text-inverse: #FFFFFF;
+    --border-primary: #E0E0E0;
+    --border-glass: rgba(255, 255, 255, 0.2);
+  }
+
+
+  body {
+    @apply bg-primary text-text-primary;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, #F7F7F9 0%, #FFFFFF 60%);
+  }
+
+  h1 {
+    @apply text-[48px] font-bold leading-tight;
+  }
+
+  h2 {
+    @apply text-[36px] font-bold leading-tight;
+  }
+
+  h3 {
+    @apply text-[24px] font-semibold leading-tight;
+  }
+
+  p {
+    @apply text-base font-normal text-text-secondary;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Focus outline for a11y */
+.focus-ring:focus-visible {
+  outline: 2px solid rgb(59 130 246);
+  outline-offset: 2px;
+}
+
+/* Glass utilities */
+@layer components {
+  .glass { @apply bg-white/70 backdrop-blur-md border border-[color:var(--border-glass)] shadow-sm; }
+  .glass-dark { @apply bg-white/60 backdrop-blur-lg border border-[color:var(--border-glass)] shadow-md; }
+  .pill { @apply rounded-full; }
+}
+

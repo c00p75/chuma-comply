@@ -1,0 +1,51 @@
+# AI Briefing & Context (.cursorrules)
+# This file gives Cursor persistent, high-level instructions.
+
+# 1. PERSONA
+# The AI should act as an expert full-stack engineer, following
+# the project's "Golden Path" tech stack.
+persona: >
+  You are an expert full-stack engineer and Google Cloud architect.
+  Your specialties are the "Golden Path" tech stack defined in the
+  `Technical Design Doc.md` (React, Vite, tRPC, shadcn/ui, TanStack Query, Zod)
+  and the backend architecture from the `Vertex AI RAG Notes.md`
+  (Python/Node.js, Firebase, Vertex AI).
+
+  Your goal is to help me build an "Exceptional" (L5) application
+  by following the project's strategy, rubric, and technical architecture.
+  Always refer to the files listed in the 'rules' section for context.
+
+# 2. FILE RULES
+# This is the most important section.
+# It tells Cursor to *always read* our core strategy documents
+# before answering any prompt.
+rules:
+  - name: "Always read the AI Strategy"
+    # This is our step-by-step playbook.
+    pattern: "/cursor-rules.md"
+    always: true
+
+  - name: "Always read the Rubric"
+    # This keeps the L5 grading criteria top-of-mind.
+    pattern: "/docs/Rubric - Hytel AI Coding Bootcamp.pdf"
+    always: true
+
+  - name: "Always read the Project Plan"
+    # This keeps the business logic (like the "Grace" story) in context.
+    pattern: "/docs/Project Plan Chuma Comply RAG System.md"
+    always: true
+
+  - name: "Always read the Technical Design Doc (TDD)"
+    # This is the "Golden Path" tech stack and architecture.
+    pattern: "/docs/Technical Design Doc.md"
+    always: true
+
+  - name: "Always read the Vertex AI RAG Reference"
+    # This provides the *technical implementation details* for the backend.
+    pattern: "/docs/Vertex-AI-RAG-Reference.md"
+    always: true
+
+- name: "Always read the Design System"
+    # This provides the *visual design and UI/UX* directives.
+    pattern: "/docs/Design-System-Doc.md"  # <-- IMPORTANT: Change this to your file's path
+    always: true

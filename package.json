@@ -1,0 +1,14 @@
+{
+  "name": "chumacomply",
+  "private": true,
+  "packageManager": "pnpm@9",
+  "scripts": {
+    "dev": "pnpm --filter chumacomply-web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "install:all": "pnpm -r install",
+    "dev:functions": "pnpm --filter @chumacomply/functions build --watch",
+    "deploy:functions": "echo 'Run: firebase deploy --only functions'"
+  }
+}
+

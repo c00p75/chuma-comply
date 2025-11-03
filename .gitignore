@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+apps/web/node_modules/
+packages/**/node_modules/
+services/functions/node_modules/
+
+# Builds / caches
+.dist/
+dist/
+build/
+coverage/
+.vite/
+.cache/
+.eslintcache
+
+# OS / editor files
+.DS_Store
+*.log
+
+# Env files
+.env
+.env.*
+
+# Misc
+.vercel/
+.firebase/
+*.local
+
