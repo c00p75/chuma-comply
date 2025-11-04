@@ -20,6 +20,23 @@ coverage/
 # Env files
 .env
 .env.*
+*.env.local
+*.env.production
+*.env.development
+
+# Secrets and credentials
+*.key
+*secret*
+*credential*
+*password*
+*api-key*
+*apikey*
+*.pem
+*.p12
+*.pfx
+*.jks
+credentials.json
+service-account.json
 
 # Misc
 .vercel/
