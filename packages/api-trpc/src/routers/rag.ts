@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { publicProcedure, router } from '../trpc';
+import { publicProcedure, router } from '../trpc.js';
 import { TRPCError } from '@trpc/server';
 
 export const ragRouter = router({

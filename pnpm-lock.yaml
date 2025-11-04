@@ -97,14 +97,17 @@ importers:
   services/functions:
     dependencies:
       '@chumacomply/api-trpc':
-        specifier: workspace:*
-        version: link:../../packages/api-trpc
+        specifier: file:./vendor/@chumacomply/api-trpc
+        version: file:services/functions/vendor/@chumacomply/api-trpc
       '@trpc/server':
         specifier: ^11.0.0-rc.462
         version: 11.7.1(typescript@5.9.3)
       firebase-functions:
         specifier: ^5.0.0
         version: 5.1.1(firebase-admin@12.7.0)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
     devDependencies:
       rimraf:
         specifier: ^6.0.1
@@ -201,6 +204,9 @@ packages:
   '@babel/types@7.28.5':
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
+
+  '@chumacomply/api-trpc@file:services/functions/vendor/@chumacomply/api-trpc':
+    resolution: {directory: services/functions/vendor/@chumacomply/api-trpc, type: directory}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -2277,6 +2283,8 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
+
+  '@chumacomply/api-trpc@file:services/functions/vendor/@chumacomply/api-trpc': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true

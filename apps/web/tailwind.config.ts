@@ -9,12 +9,17 @@ export default {
     extend: {
       colors: {
         primary: '#FFFFFF',
-        secondary: '#F7F7F9',
+        secondary: '#F9F9F9',
         inverse: '#121212',
-        'text-primary': '#1A1A1A',
-        'text-secondary': '#6B6B6B',
+        'text-primary': '#333333',
+        'text-secondary': '#888888',
         'text-inverse': '#FFFFFF',
-        'border-primary': '#E0E0E0',
+        'border-primary': '#EAEAEA',
+        bg: {
+          primary: '#FFFFFF',
+          secondary: '#F9F9F9',
+          inverse: '#121212',
+        },
       },
       spacing: {
         'section': '64px',
@@ -22,6 +27,9 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+      },
+      boxShadow: {
+        'subtle': '0 4px 12px rgba(0, 0, 0, 0.03)',
       },
     },
   },

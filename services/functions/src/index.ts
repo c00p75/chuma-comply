@@ -17,7 +17,10 @@ function corsHeaders(origin: string | null) {
   } as Record<string, string>;
 }
 
-export const api = onRequest({ region: 'us-central1' }, async (req, res) => {
+export const api = onRequest({ 
+  region: 'us-central1',
+  serviceAccount: 'rag-api-sa@chumacomply.iam.gserviceaccount.com'
+}, async (req, res) => {
   // CORS preflight
   const origin = req.headers.origin ?? null;
   if (req.method === 'OPTIONS') {

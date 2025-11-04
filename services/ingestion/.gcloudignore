@@ -1,0 +1,20 @@
+# Python-specific ignores for ingestion function
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+*.md
+!README.md
+test_*.py
+

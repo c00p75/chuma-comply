@@ -23,8 +23,8 @@ The provided images show two distinct, but related, visual themes. Apply them ba
    * **Use Case:** Ideal for marketing websites, landing pages, and content-heavy layouts.  
 2. **"App/UI" Theme (Glassmorphism):**  
    * **Appearance:** Soft, layered, and translucent.  
-   * **Backgrounds:** Uses a light, subtle gradient (e.g., light lavender/grey like \#F7F7F9).  
-   * **Key Element:** UI containers (like modals, app windows, or cards) are "glass"—they have a semi-transparent white background, a backdrop-filter: blur(), a soft border, and a gentle shadow.  
+   * **Backgrounds:** Uses a soft, full-screen gradient transitioning from pale lavender/light purplish-grey (hsl(270, 20%, 97%) or \#F5F3F7) at the top to light greyish-white (\#F9F9F9) at the bottom.  
+   * **Key Element:** UI containers (like modals, app windows, or cards) are "glass"—they have a clean, solid off-white (\#FFFFFF) background with very subtle borders (\#EAEAEA) or soft, diffuse box shadows (0 4px 12px rgba(0, 0, 0, 0.03)) to make them "float" on the gradient.  
    * **Use Case:** Ideal for desktop applications, modals, dashboards, and focused UI elements.
 
 ### **3\. Color Palette**
@@ -33,25 +33,27 @@ Use this simple, high-contrast palette.
 
 | Token | Value | Description |
 | :---- | :---- | :---- |
-| bg-primary | \#FFFFFF | Primary background (e.g., web sections, cards). |
-| bg-secondary | \#F7F7F9 | Lightest grey (e.g., app background). |
+| bg-primary | \#FFFFFF | Primary background (e.g., web sections, cards, inputs). |
+| bg-secondary | \#F9F9F9 | Lightest grey (e.g., gradient end color). |
+| bg-gradient-start | hsl(270, 20%, 97%) or \#F5F3F7 | Pale lavender/light purplish-grey (gradient start). |
 | bg-inverse | \#121212 | Dark background (e.g., dark web sections, primary buttons). |
-| text-primary | \#1A1A1A | Main text, headings (on light backgrounds). |
-| text-secondary | \#6B6B6B | Subtext, placeholder text, body copy. |
+| text-primary | \#333333 | Main text, headings (dark charcoal grey). |
+| text-secondary | \#888888 | Subtext, placeholder text, descriptive paragraphs (medium grey). |
 | text-inverse | \#FFFFFF | All text on bg-inverse. |
-| border-primary | \#E0E0E0 | Subtle borders for cards and inputs. |
+| border-primary | \#EAEAEA | Very subtle, light grey borders for cards and inputs. |
 | border-glass | rgba(255, 255, 255, 0.2) | Border color for glassmorphism elements. |
+| shadow-subtle | 0 4px 12px rgba(0, 0, 0, 0.03) | Soft, diffuse box shadow for floating elements. |
 
 ### **4\. Typography**
 
 * **Font Family:** Use a modern, geometric sans-serif font.  
   * **CSS:** font-family: 'Inter', \-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;  
 * **Typographic Scale:**  
-  * **H1 (Page Title):** font-size: 48px; font-weight: 700; (e.g., "Where Money Grows")  
-  * **H2 (Section Head):** font-size: 36px; font-weight: 700; (e.g., "What would you like to know?")  
-  * **H3 (Sub-section):** font-size: 24px; font-weight: 600; (e.g., "Use cases")  
+  * **H1 (Page Title):** font-size: 48px; font-weight: 600; color: var(--text-primary);  
+  * **H2 (Section Head):** font-size: 36px; font-weight: 600; color: var(--text-primary);  
+  * **H3 (Sub-section):** font-size: 24px; font-weight: 600; color: var(--text-primary);  
   * **Body:** font-size: 16px; font-weight: 400; color: var(--text-secondary);  
-  * **Subtext/Caption:** font-size: 14px; font-weight: 400; color: var(--text-secondary); (e.g., "Use one of the most common prompts...")
+  * **Subtext/Caption:** font-size: 14px; font-weight: 400; color: var(--text-secondary);
 
 ### **5\. Layout & Spacing**
 
@@ -60,7 +62,7 @@ Use this simple, high-contrast palette.
   * Component-internal padding (e.g., inside a card): 16px (2 units) or 24px (3 units).  
   * Gaps between elements: 24px (3 units) or 32px (4 units).  
   * Section padding (top and bottom): 64px (8 units) or 96px (12 units).  
-* **Layout:** Content should be centered with a maximum width (e.g., 1100px) for web pages.
+* **Layout:** Main container content should be centered with a maximum width (e.g., max-w-3xl in Tailwind, approximately 768px) for a spacious, uncluttered feel. Use generous padding and margins (e.g., p-8 or gap-6).
 
 ### **6\. Components**
 
@@ -78,25 +80,25 @@ Use this simple, high-contrast palette.
 #### **Cards**
 
 * **Web Card (High-Contrast):**  
-  * **Background:** var(--bg-primary)  
-  * **Border:** 1px solid var(--border-primary)  
+  * **Background:** var(--bg-primary) (\#FFFFFF)  
+  * **Border:** 1px solid var(--border-primary) (\#EAEAEA)  
   * **Border Radius:** 12px  
-  * **Box Shadow:** 0 4px 8px rgba(0, 0, 0, 0.02) (very-subtle)  
+  * **Box Shadow:** var(--shadow-subtle) (0 4px 12px rgba(0, 0, 0, 0.03))  
 * **App Card (Glassmorphism):**  
-  * **Background:** rgba(255, 255, 255, 0.7) (adjust opacity as needed)  
-  * **Backdrop Filter:** backdrop-filter: blur(10px);  
-  * **Border:** 1px solid var(--border-glass)  
+  * **Background:** var(--bg-primary) (\#FFFFFF) - clean, solid off-white  
+  * **Border:** 1px solid var(--border-primary) (\#EAEAEA) - very subtle, light grey  
   * **Border Radius:** 16px  
-  * **Box Shadow:** 0 8px 16px rgba(0, 0, 0, 0.05) (soft and diffuse)
+  * **Box Shadow:** var(--shadow-subtle) (0 4px 12px rgba(0, 0, 0, 0.03)) - soft, diffuse shadow to make cards "float" on the gradient
 
 #### **Input Fields**
 
 * **App Input (Bottom Bar):**  
   * **Style:** Pill-shaped or highly rounded rectangle.  
   * **Border Radius:** 24px or 999px  
-  * **Border:** 1px solid var(--border-primary)  
-  * **Background:** var(--bg-primary)  
-  * **Inside:** Icon on the left, placeholder text (color: var(--text-secondary);).
+  * **Border:** 1px solid var(--border-primary) (\#EAEAEA)  
+  * **Background:** var(--bg-primary) (\#FFFFFF) - clean, solid off-white  
+  * **Box Shadow:** var(--shadow-subtle) (0 4px 12px rgba(0, 0, 0, 0.03)) - to make input "float" on the gradient  
+  * **Inside:** Icon on the left, placeholder text (color: var(--text-secondary); \#888888).
 
 ### **7\. Iconography**
 

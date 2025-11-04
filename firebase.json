@@ -1,0 +1,42 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": [
+    {
+      "source": "services/functions",
+      "codebase": "default",
+      "runtime": "nodejs20",
+      "serviceAccount": "rag-api-sa@chumacomply.iam.gserviceaccount.com",
+      "predeploy": [
+        "bash \"$RESOURCE_DIR/predeploy.sh\""
+      ]
+    },
+    {
+      "source": "services/ingestion",
+      "codebase": "ingestion",
+      "runtime": "python311",
+      "entryPoint": "ingest_document",
+      "serviceAccount": "rag-ingestion-sa@chumacomply.iam.gserviceaccount.com",
+      "environmentVariables": {
+        "CORPUS_PATH": "gs://chumacomply-corpus"
+      }
+    }
+  ],
+  "hosting": {
+    "public": "apps/web/dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
+
