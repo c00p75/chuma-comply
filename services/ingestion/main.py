@@ -13,11 +13,7 @@ from datetime import datetime
 
 from google.cloud import firestore
 from google.cloud import storage
-
-from pdf_parser import extract_text_from_pdf, clean_text
-from chunking import semantic_chunk
-from metadata import generate_metadata, classify_document
-from embeddings import batch_generate_embeddings
+import functions_framework
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -100,6 +96,12 @@ def process_pdf(pdf_path: str, filename: str) -> Dict[str, Any]:
     Returns:
         Dictionary with processing results
     """
+    # Lazy load heavy libraries to avoid cold start timeout
+    from pdf_parser import extract_text_from_pdf, clean_text
+    from chunking import semantic_chunk
+    from metadata import generate_metadata, classify_document
+    from embeddings import batch_generate_embeddings
+    
     try:
         logger.info(f"Processing {filename}...")
         
@@ -209,6 +211,7 @@ def process_pdf(pdf_path: str, filename: str) -> Dict[str, Any]:
         }
 
 
+@functions_framework.http
 def ingest_document(request):
     """
     HTTP Cloud Function entry point for document ingestion.

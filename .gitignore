@@ -38,8 +38,15 @@ coverage/
 credentials.json
 service-account.json
 
+# Python virtual environments
+venv/
+**/venv/
+*.pyc
+__pycache__/
+
 # Misc
 .vercel/
 .firebase/
 *.local
+docs/archive/
 

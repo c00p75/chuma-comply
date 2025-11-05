@@ -1,5 +1,6 @@
 """
 Vertex AI embedding generation for text chunks using REST API.
+This version uses google-auth for server-safe authentication.
 """
 
 import os
@@ -7,6 +8,8 @@ import time
 import logging
 from typing import List
 import requests
+import google.auth
+import google.auth.transport.requests
 
 logger = logging.getLogger(__name__)
 
@@ -16,19 +19,28 @@ EMBEDDING_DIMENSIONS = 768
 BATCH_SIZE = 5  # Conservative batch size for REST API
 
 
-def _get_access_token() -> str:
-    """Get GCP access token for authentication."""
-    import subprocess
+def _get_authed_session() -> requests.Session:
+    """
+    Gets a Requests session object with automatically refreshed GCP auth.
+    This will use the attached service account (rag-ingestion-sa) credentials.
+    """
     try:
-        result = subprocess.run(
-            ["gcloud", "auth", "print-access-token"],
-            capture_output=True,
-            text=True,
-            check=True
+        # Get Application Default Credentials
+        credentials, project = google.auth.default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
         )
-        return result.stdout.strip()
+        
+        # Create an authorized session
+        auth_request = google.auth.transport.requests.Request()
+        credentials.refresh(auth_request)
+        
+        authed_session = requests.Session()
+        authed_session.headers.update(
+            {"Authorization": f"Bearer {credentials.token}"}
+        )
+        return authed_session
     except Exception as e:
-        logger.error(f"Error getting access token: {str(e)}")
+        logger.error(f"Error getting authenticated session: {str(e)}")
         raise
 
 
@@ -45,11 +57,12 @@ def generate_embedding(text: str, project_id: str, location: str = "us-central1"
         Embedding vector (768 dimensions)
     """
     try:
-        access_token = _get_access_token()
+        # Get an authenticated session instead of a manual token
+        authed_session = _get_authed_session()
+        
         url = f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{location}/publishers/google/models/{EMBEDDING_MODEL}:predict"
         
         headers = {
-            "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
         }
         
@@ -62,7 +75,8 @@ def generate_embedding(text: str, project_id: str, location: str = "us-central1"
             ]
         }
         
-        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        # Use the authed_session.post, which includes the Bearer token
+        response = authed_session.post(url, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         
         result = response.json()
@@ -110,17 +124,18 @@ def batch_generate_embeddings(
     """
     all_embeddings = []
     
+    # Get one session for all batches (more efficient)
+    authed_session = _get_authed_session()
+    
     # Process in batches
     for i in range(0, len(texts), batch_size):
         batch = texts[i:i + batch_size]
         logger.info(f"Generating embeddings for batch {i // batch_size + 1}/{(len(texts) + batch_size - 1) // batch_size} ({len(batch)} texts)")
         
         try:
-            access_token = _get_access_token()
             url = f"https://{location}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{location}/publishers/google/models/{EMBEDDING_MODEL}:predict"
             
             headers = {
-                "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json",
             }
             
@@ -134,7 +149,8 @@ def batch_generate_embeddings(
                 ]
             }
             
-            response = requests.post(url, json=payload, headers=headers, timeout=60)
+            # Use the authed_session.post, which includes the Bearer token
+            response = authed_session.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
             
             result = response.json()
@@ -170,6 +186,8 @@ def batch_generate_embeddings(
             logger.info("Falling back to individual embedding generation for this batch")
             for text in batch:
                 try:
+                    # Note: This will create a new session, which is less efficient
+                    # but fine for a fallback.
                     embedding = generate_embedding(text, project_id, location)
                     all_embeddings.append(embedding)
                     time.sleep(0.2)  # Small delay between individual calls
@@ -182,4 +200,3 @@ def batch_generate_embeddings(
         raise ValueError(f"Final embedding count mismatch: {len(all_embeddings)} vs {len(texts)}")
     
     return all_embeddings
-

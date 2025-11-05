@@ -1,29 +1,78 @@
 """
 PDF text extraction and cleaning utilities.
+Now includes a PyPDF2 fallback for difficult documents.
 """
 
 import re
 import logging
 from typing import List
 
+# Try to import unstructured
 try:
     from unstructured.partition.pdf import partition_pdf
-    from unstructured.chunking.title import chunk_by_title
+    HAS_UNSTRUCTURED = True
 except ImportError:
-    # Fallback to PyPDF2 if unstructured is not available
-    try:
-        import PyPDF2
-        HAS_PYPDF2 = True
-    except ImportError:
-        HAS_PYPDF2 = False
-        logging.warning("Neither unstructured nor PyPDF2 available. PDF parsing may fail.")
+    HAS_UNSTRUCTURED = False
+    logging.warning("unstructured library not found.")
+
+# Try to import PyPDF2
+try:
+    import PyPDF2
+    HAS_PYPDF2 = True
+except ImportError:
+    HAS_PYPDF2 = False
+    logging.warning("PyPDF2 library not found. PDF parsing may fail.")
 
 logger = logging.getLogger(__name__)
 
 
+def _extract_with_unstructured(file_path: str) -> str:
+    """Extract text using unstructured.io (fast strategy)."""
+    if not HAS_UNSTRUCTURED:
+        logger.warning("unstructured not available, cannot extract.")
+        return ""
+        
+    elements = partition_pdf(
+        filename=file_path,
+        strategy="fast",  # Fast extraction without model downloads
+        infer_table_structure=True,
+    )
+    
+    # Combine all text elements
+    text_parts = []
+    for element in elements:
+        if hasattr(element, "text") and element.text:
+            text_parts.append(element.text.strip())
+    
+    full_text = "\n\n".join(text_parts)
+    logger.info(f"Unstructured extracted {len(full_text)} characters from {file_path}")
+    return full_text
+
+def _extract_with_pypdf2(file_path: str) -> str:
+    """Fallback PDF extraction using PyPDF2."""
+    if not HAS_PYPDF2:
+        logger.warning("PyPDF2 not available, cannot extract.")
+        return ""
+        
+    text_parts = []
+    try:
+        with open(file_path, "rb") as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            for page in pdf_reader.pages:
+                text = page.extract_text()
+                if text:
+                    text_parts.append(text)
+        full_text = "\n\n".join(text_parts)
+        logger.info(f"PyPDF2 extracted {len(full_text)} characters from {file_path}")
+        return full_text
+    except Exception as e:
+        logger.error(f"PyPDF2 fallback extraction failed: {str(e)}")
+        return ""
+
+
 def extract_text_from_pdf(file_path: str) -> str:
     """
-    Extract text from PDF file using unstructured.io.
+    Extract text from PDF file using the best available method.
     
     Args:
         file_path: Path to PDF file
@@ -31,46 +80,29 @@ def extract_text_from_pdf(file_path: str) -> str:
     Returns:
         Extracted text content
     """
-    try:
-        # Use unstructured.io for better layout understanding
-        elements = partition_pdf(
-            filename=file_path,
-            strategy="hi_res",  # High resolution for better accuracy
-            infer_table_structure=True,
-        )
-        
-        # Combine all text elements
-        text_parts = []
-        for element in elements:
-            if hasattr(element, "text") and element.text:
-                text_parts.append(element.text.strip())
-        
-        full_text = "\n\n".join(text_parts)
-        logger.info(f"Extracted {len(full_text)} characters from {file_path}")
-        
-        return full_text
-        
-    except Exception as e:
-        logger.error(f"Error extracting text from {file_path}: {str(e)}")
-        # Fallback to basic extraction if available
-        if HAS_PYPDF2:
-            return _extract_with_pypdf2(file_path)
-        raise
-
-
-def _extract_with_pypdf2(file_path: str) -> str:
-    """Fallback PDF extraction using PyPDF2."""
-    import PyPDF2
+    full_text = ""
     
-    text_parts = []
-    with open(file_path, "rb") as file:
-        pdf_reader = PyPDF2.PdfReader(file)
-        for page_num, page in enumerate(pdf_reader.pages):
-            text = page.extract_text()
-            if text:
-                text_parts.append(text)
-    
-    return "\n\n".join(text_parts)
+    # 1. Try unstructured first
+    if HAS_UNSTRUCTURED:
+        try:
+            full_text = _extract_with_unstructured(file_path)
+        except Exception as e:
+            logger.warning(f"unstructured failed for {file_path}: {str(e)}. Trying fallback.")
+            full_text = ""
+            
+    # 2. If unstructured returned nothing, try PyPDF2
+    if not full_text and HAS_PYPDF2:
+        logger.info(f"Unstructured returned no text. Trying PyPDF2 fallback for {file_path}.")
+        try:
+            full_text = _extract_with_pypdf2(file_path)
+        except Exception as e:
+            logger.error(f"PyPDF2 fallback also failed for {file_path}: {str(e)}")
+            full_text = "" # Ensure it's an empty string on failure
+
+    if not full_text:
+        logger.error(f"All extraction methods failed for {file_path}. Returning empty string.")
+        
+    return full_text
 
 
 def clean_text(text: str) -> str:
@@ -110,4 +142,3 @@ def clean_text(text: str) -> str:
     cleaned_text = re.sub(r"\n{3,}", "\n\n", cleaned_text)  # Max 2 consecutive newlines
     
     return cleaned_text.strip()
-
