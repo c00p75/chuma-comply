@@ -12,6 +12,20 @@ export type ChatMessage = {
   role: 'user' | 'bot';
   content: string;
   sources?: { title: string }[];
+  createdAt?: Date;
+};
+
+export type Conversation = {
+  id: string;
+  userId: string;
+  title: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type ConversationWithPreview = Conversation & {
+  lastMessage?: string;
+  lastMessageAt?: Date;
 };
 
 

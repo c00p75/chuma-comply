@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import LandingView from '@/views/LandingView';
 import PricingView from '@/views/PricingView';
@@ -27,11 +27,7 @@ function ProtectedLayout() {
     return <OnboardingView />;
   }
 
-  return (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
-  );
+  return <AppLayout />;
 }
 
 export default function App() {
@@ -53,11 +49,13 @@ export default function App() {
       <Route path="/signin" element={<AuthView />} />
       <Route path="/signup" element={<AuthView />} />
 
-      {/* Protected routes */}
+      {/* Protected routes - SPA mode */}
       <Route element={<ProtectedLayout />}>
         <Route path="/app" element={<ChatView />} />
+        <Route path="/app/:conversationId" element={<ChatView />} />
+        <Route path="/chat/:conversationId" element={<ChatView />} />
         <Route path="/chat" element={<ChatView />} />
-        <Route path="/knowledge" element={<KnowledgeBaseView />} />
+        <Route path="/knowledge-base" element={<KnowledgeBaseView />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,4 +1,4 @@
-export { appRouter } from './routers';
-export type { AppRouter } from './routers';
+export { appRouter } from './routers/index.js';
+export type { AppRouter } from './routers/index.js';
 
 
