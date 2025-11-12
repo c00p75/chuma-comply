@@ -12,6 +12,14 @@ export type ChatMessage = {
   role: 'user' | 'bot';
   content: string;
   sources?: { title: string }[];
+  checklist?: Array<{
+    step: number;
+    title: string;
+    description: string;
+    regulatoryBody: string;
+    required: boolean;
+    sources: Array<{ title: string; section?: string }>;
+  }>;
   createdAt?: Date;
 };
 

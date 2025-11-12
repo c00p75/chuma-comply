@@ -12,6 +12,8 @@ coverage/
 .vite/
 .cache/
 .eslintcache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 
 # OS / editor files
 .DS_Store
@@ -23,6 +25,8 @@ coverage/
 *.env.local
 *.env.production
 *.env.development
+*.bak
+*.tmp
 
 # Secrets and credentials
 *.key

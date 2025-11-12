@@ -21,9 +21,8 @@ export declare const vectorChunkSchema: z.ZodObject<{
     chunkIndex: z.ZodNumber;
     startChar: z.ZodNumber;
     endChar: z.ZodNumber;
-    createdAt: z.ZodOptional<z.ZodUnion<[z.ZodDate, z.ZodString, z.ZodNumber]>>;
+    createdAt: z.ZodOptional<z.ZodAny>;
 }, "strip", z.ZodTypeAny, {
-    content: string;
     chunkId: string;
     sourceDocument: string;
     documentType: string;
@@ -31,6 +30,7 @@ export declare const vectorChunkSchema: z.ZodObject<{
     subscriptionTier: "free" | "pro";
     regulatoryBody: string;
     topicPrimary: string;
+    content: string;
     embedding: number[];
     embeddingDim: 768;
     chunkIndex: number;
@@ -40,9 +40,8 @@ export declare const vectorChunkSchema: z.ZodObject<{
     actName?: string | undefined;
     sectionNumber?: string | undefined;
     pageNumber?: number | undefined;
-    createdAt?: string | number | Date | undefined;
+    createdAt?: any;
 }, {
-    content: string;
     chunkId: string;
     sourceDocument: string;
     documentType: string;
@@ -50,6 +49,7 @@ export declare const vectorChunkSchema: z.ZodObject<{
     subscriptionTier: "free" | "pro";
     regulatoryBody: string;
     topicPrimary: string;
+    content: string;
     embedding: number[];
     embeddingDim: 768;
     chunkIndex: number;
@@ -59,7 +59,7 @@ export declare const vectorChunkSchema: z.ZodObject<{
     actName?: string | undefined;
     sectionNumber?: string | undefined;
     pageNumber?: number | undefined;
-    createdAt?: string | number | Date | undefined;
+    createdAt?: any;
 }>;
 export type VectorChunk = z.infer<typeof vectorChunkSchema>;
 /**
@@ -83,9 +83,8 @@ export declare const vectorChunkRetrievalSchema: z.ZodObject<Omit<{
     chunkIndex: z.ZodNumber;
     startChar: z.ZodNumber;
     endChar: z.ZodNumber;
-    createdAt: z.ZodOptional<z.ZodUnion<[z.ZodDate, z.ZodString, z.ZodNumber]>>;
+    createdAt: z.ZodOptional<z.ZodAny>;
 }, "embedding">, "strip", z.ZodTypeAny, {
-    content: string;
     chunkId: string;
     sourceDocument: string;
     documentType: string;
@@ -93,6 +92,7 @@ export declare const vectorChunkRetrievalSchema: z.ZodObject<Omit<{
     subscriptionTier: "free" | "pro";
     regulatoryBody: string;
     topicPrimary: string;
+    content: string;
     embeddingDim: 768;
     chunkIndex: number;
     startChar: number;
@@ -101,9 +101,8 @@ export declare const vectorChunkRetrievalSchema: z.ZodObject<Omit<{
     actName?: string | undefined;
     sectionNumber?: string | undefined;
     pageNumber?: number | undefined;
-    createdAt?: string | number | Date | undefined;
+    createdAt?: any;
 }, {
-    content: string;
     chunkId: string;
     sourceDocument: string;
     documentType: string;
@@ -111,6 +110,7 @@ export declare const vectorChunkRetrievalSchema: z.ZodObject<Omit<{
     subscriptionTier: "free" | "pro";
     regulatoryBody: string;
     topicPrimary: string;
+    content: string;
     embeddingDim: 768;
     chunkIndex: number;
     startChar: number;
@@ -119,6 +119,6 @@ export declare const vectorChunkRetrievalSchema: z.ZodObject<Omit<{
     actName?: string | undefined;
     sectionNumber?: string | undefined;
     pageNumber?: number | undefined;
-    createdAt?: string | number | Date | undefined;
+    createdAt?: any;
 }>;
 export type VectorChunkRetrieval = z.infer<typeof vectorChunkRetrievalSchema>;

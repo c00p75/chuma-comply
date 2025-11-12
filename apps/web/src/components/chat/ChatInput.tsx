@@ -4,6 +4,7 @@ import { useChatStore } from '@/store/chatStore';
 import { useAuth } from '@/hooks/use-auth';
 import { Send, MessageCircle } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { trpc } from '@/lib/trpc';
 
 export default function ChatInput() {
   const { user } = useAuth();
@@ -53,19 +54,25 @@ export default function ChatInput() {
       await addMessage({ role: 'user', content: text }, user.uid);
       setLoading(true);
 
-      // Phase 2 mock - TODO: Replace with actual tRPC call
-      setTimeout(async () => {
-        try {
-          await addMessage({
-            role: 'bot',
-            content:
-              'To operate a digital agency in Zambia and collect user data, you must register with the Data Protection Commissioner. $${'+'}$Source: The Data Protection Act, Sec. 40$${'+'}$',
-            sources: [{ title: 'The Data Protection Act, Sec. 40' }],
-          }, user.uid);
-        } finally {
-          setLoading(false);
-        }
-      }, 1500);
+      // Call RAG API
+      try {
+        const response = await trpc.rag.getComplianceChecklist.query({ query: text });
+        await addMessage({
+          role: 'bot',
+          content: response.content,
+          sources: response.sources,
+          checklist: (response as any).checklist,
+        }, user.uid);
+      } catch (error: any) {
+        console.error('Failed to get RAG response:', error);
+        await addMessage({
+          role: 'bot',
+          content: error?.message || 'Sorry, I encountered an error while processing your question. Please try again.',
+          sources: [],
+        }, user.uid);
+      } finally {
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
       // Error already shown by store
@@ -80,6 +87,14 @@ export default function ChatInput() {
           ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (value.trim() && !isLoading) {
+                onSubmit(e as any);
+              }
+            }
+          }}
           rows={1}
           placeholder="Ask whatever you want"
           className="flex-1 bg-transparent border-0 focus:ring-0 focus:outline-none resize-none text-base text-text-primary placeholder:text-text-secondary"

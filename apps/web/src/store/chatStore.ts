@@ -93,6 +93,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             role: data.role,
             content: data.content,
             sources: data.sources,
+            checklist: data.checklist,
             createdAt: data.createdAt?.toDate(),
           };
         });

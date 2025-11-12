@@ -163,7 +163,7 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed md:static inset-0 md:inset-auto z-30 md:z-auto w-full md:w-64 glass rounded-2xl md:rounded-xl md:mr-4 flex flex-col',
+        'fixed md:static inset-0 md:inset-auto z-30 md:z-auto w-full md:w-64 glass rounded-2xl md:rounded-xl md:mr-4 flex flex-col h-full max-h-screen overflow-hidden',
         isMobileMenuOpen ? 'block' : 'hidden md:flex'
       )}
       role="complementary"
@@ -207,7 +207,7 @@ export default function Sidebar() {
         <div className="absolute bottom-0 left-4 right-4 h-px bg-[color:var(--border-primary)]" />
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 min-h-0 overflow-y-auto p-2">
         {conversationsLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="size-5 animate-spin text-text-secondary" />

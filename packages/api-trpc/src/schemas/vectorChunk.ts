@@ -22,7 +22,7 @@ export const vectorChunkSchema = z.object({
   chunkIndex: z.number(),
   startChar: z.number(),
   endChar: z.number(),
-  createdAt: z.union([z.date(), z.string(), z.number()]).optional(), // Firestore timestamp
+  createdAt: z.any().optional(), // Firestore Timestamp object (can be Timestamp, date, string, or number)
 });
 
 export type VectorChunk = z.infer<typeof vectorChunkSchema>;

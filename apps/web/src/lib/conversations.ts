@@ -110,6 +110,7 @@ export async function addMessageToConversation(
     role: message.role,
     content: message.content,
     sources: message.sources || [],
+    checklist: message.checklist || [],
     createdAt: serverTimestamp(),
   });
   

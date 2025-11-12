@@ -1,5 +1,5 @@
 export declare const ragRouter: import("@trpc/server").TRPCBuiltRouter<{
-    ctx: object;
+    ctx: import("../trpc.js").Context;
     meta: object;
     errorShape: import("@trpc/server").TRPCDefaultErrorShape;
     transformer: false;
@@ -13,6 +13,17 @@ export declare const ragRouter: import("@trpc/server").TRPCBuiltRouter<{
             sources: {
                 title: string;
             }[];
+            checklist?: {
+                step: number;
+                title: string;
+                description: string;
+                regulatoryBody: string;
+                required: boolean;
+                sources: {
+                    title: string;
+                    section?: string | undefined;
+                }[];
+            }[] | undefined;
         };
         meta: object;
     }>;
