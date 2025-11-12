@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Send, MessageCircle } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { trpc } from '@/lib/trpc';
+import { cn } from '@/lib/utils';
 
 export default function ChatInput() {
   const { user } = useAuth();
@@ -105,7 +106,13 @@ export default function ChatInput() {
           aria-disabled={isLoading || !value.trim()}
           className="size-9 md:size-10 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center hover:bg-[#2A2A2A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring flex-shrink-0"
         >
-          <Send className="size-4 md:size-5" strokeWidth={2} />
+          <Send 
+            className={cn(
+              "size-4 md:size-5 transition-transform duration-200 -ml-1",
+              value.trim() && !isLoading && "rotate-45"
+            )} 
+            strokeWidth={2} 
+          />
         </button>
       </div>
     </form>
