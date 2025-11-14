@@ -11,13 +11,19 @@ export function extractKeywordHints(query) {
     const activities = [];
     const documentTypes = [];
     let industry;
-    // Data Protection / Privacy keywords
-    if (queryLower.includes('email') ||
-        queryLower.includes('data') ||
+    // Data Protection / Privacy keywords - Only trigger for explicit data privacy queries
+    // Don't trigger on just "data" or "employees" - require explicit privacy/data protection context
+    const hasExplicitDataPrivacyKeywords = (queryLower.includes('data protection') ||
+        queryLower.includes('data privacy') ||
         queryLower.includes('privacy') ||
         queryLower.includes('personal information') ||
         queryLower.includes('customer data') ||
-        queryLower.includes('client data')) {
+        queryLower.includes('client data') ||
+        queryLower.includes('data protection act') ||
+        queryLower.includes('data controller') ||
+        queryLower.includes('data processor') ||
+        (queryLower.includes('email') && (queryLower.includes('privacy') || queryLower.includes('protection'))));
+    if (hasExplicitDataPrivacyKeywords) {
         activities.push('data_protection');
         documentTypes.push('data_protection');
         if (!industry)
@@ -51,7 +57,15 @@ export function extractKeywordHints(query) {
         queryLower.includes('pacra') ||
         queryLower.includes('company') ||
         queryLower.includes('incorporate') ||
-        queryLower.includes('incorporation')) {
+        queryLower.includes('incorporation') ||
+        queryLower.includes('starting') ||
+        queryLower.includes('start') ||
+        queryLower.includes('begin') ||
+        queryLower.includes('new business') ||
+        queryLower.includes('set up') ||
+        queryLower.includes('setup') ||
+        queryLower.includes('establish') ||
+        queryLower.includes('launch')) {
         activities.push('business_registration');
         documentTypes.push('business_registration');
     }

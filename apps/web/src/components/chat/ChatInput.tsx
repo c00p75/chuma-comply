@@ -108,7 +108,7 @@ export default function ChatInput() {
         >
           <Send 
             className={cn(
-              "size-4 md:size-5 transition-transform duration-200 -ml-1",
+              "size-4 md:size-5 transition-transform duration-300 -ml-1",
               value.trim() && !isLoading && "rotate-45"
             )} 
             strokeWidth={2} 

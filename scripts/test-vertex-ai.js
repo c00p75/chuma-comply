@@ -75,7 +75,7 @@ async function testContentGeneration() {
   const client = await auth.getClient();
   const accessToken = await client.getAccessToken();
   
-  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
+  const url = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.5-flash:generateContent`;
   
   const testPrompt = `Context from legal documents:
 
@@ -142,7 +142,7 @@ Format your response as clear, readable text with proper citations. Structure lo
       .join('');
     
     console.log(`✅ Content generation successful!`);
-    console.log(`   Model: gemini-2.0-flash-exp`);
+    console.log(`   Model: gemini-2.5-flash`);
     console.log(`   Response length: ${text.length} characters\n`);
     console.log(`📝 Generated Response:\n${'─'.repeat(60)}\n${text}\n${'─'.repeat(60)}\n`);
     

@@ -20,17 +20,6 @@ export default function Header() {
           </button>
         </div>
         <Logo className="text-lg" />
-        <div className="flex items-center gap-3">
-          {user?.photoURL ? (
-            <img 
-              src={user.photoURL} 
-              alt={user.displayName || 'User'} 
-              className="size-8 md:size-9 rounded-full border-2 border-white/50" 
-            />
-          ) : (
-            <div className="size-8 md:size-9 rounded-full bg-gray-300 border-2 border-white/50" />
-          )}
-        </div>
       </div>
     </header>
   );

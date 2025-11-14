@@ -41,6 +41,50 @@ storage_client = storage.Client(project=PROJECT_ID)
 logger.info(f"Initialized with PROJECT_ID: {PROJECT_ID}, LOCATION: {LOCATION}, CORPUS_PATH: {CORPUS_PATH}")
 
 
+def update_vector_db_metadata(
+    embedding_model: str = "text-embedding-005",
+    dimensions: int = 768
+) -> None:
+    """
+    Update or create vectorDB metadata document with current stats.
+    
+    Args:
+        embedding_model: The embedding model used
+        dimensions: Embedding dimensions
+    """
+    try:
+        # Count total chunks and unique documents in a single pass
+        chunks_ref = db.collection("vectorChunks")
+        chunks = chunks_ref.stream()
+        unique_docs = set()
+        total_chunks = 0
+        
+        for chunk in chunks:
+            total_chunks += 1
+            doc_data = chunk.to_dict()
+            if doc_data and "sourceDocument" in doc_data:
+                unique_docs.add(doc_data["sourceDocument"])
+        
+        total_documents = len(unique_docs)
+        
+        # Update or create metadata document
+        metadata_ref = db.collection("vectorDB").document("metadata")
+        metadata_ref.set({
+            "version": 1,
+            "embeddingModel": embedding_model,
+            "dimensions": dimensions,
+            "documents": total_documents,
+            "chunks": total_chunks,
+            "updatedAt": firestore.SERVER_TIMESTAMP,
+        }, merge=True)
+        
+        logger.info(f"Updated vectorDB metadata: {total_documents} documents, {total_chunks} chunks")
+    except Exception as e:
+        logger.error(f"Error updating vectorDB metadata: {str(e)}", exc_info=True)
+        # Don't fail the ingestion if metadata update fails
+        pass
+
+
 def get_pdfs_from_gcs(bucket_name: str) -> List[str]:
     """
     List all PDF files in a GCS bucket.
@@ -144,6 +188,9 @@ def process_pdf(pdf_path: str, filename: str) -> Dict[str, Any]:
             raise ValueError(f"Embedding count mismatch: {len(embeddings)} vs {len(chunks_with_metadata)}")
         
         # Step 6: Store in Firestore
+        # Firestore batch limit is 500, but with embeddings we need smaller batches (~100-150)
+        # Each chunk with 768-dim embedding is ~3-4KB, so 100 chunks ≈ 400KB (safe)
+        BATCH_SIZE = 100
         batch = db.batch()
         stored_count = 0
         
@@ -158,10 +205,18 @@ def process_pdf(pdf_path: str, filename: str) -> Dict[str, Any]:
                 logger.debug(f"Chunk {chunk_id} already exists, skipping")
                 continue
             
+            # Validate filename is not empty
+            if not filename or not filename.strip():
+                logger.error(f"Empty filename for chunk {chunk_id}, using fallback")
+                filename = f"unknown_{chunk_id}.pdf"
+            
+            # Ensure sourceDocument is always set and valid
+            source_document = filename.strip() if filename else f"unknown_{chunk_id}.pdf"
+            
             # Prepare document
             doc_data = {
                 "chunkId": chunk_id,
-                "sourceDocument": filename,
+                "sourceDocument": source_document,  # Always use validated filename
                 "documentType": chunk_data["documentType"],
                 "industry": chunk_data["industry"],
                 "subscriptionTier": chunk_data["subscriptionTier"],
@@ -180,20 +235,28 @@ def process_pdf(pdf_path: str, filename: str) -> Dict[str, Any]:
                 "createdAt": firestore.SERVER_TIMESTAMP,
             }
             
+            # Log sourceDocument for debugging
+            if i == 0 or i % 100 == 0:  # Log first chunk and every 100th chunk
+                logger.info(f"Storing chunk {chunk_id} with sourceDocument: {source_document}, actName: {chunk_data.get('actName', 'N/A')}")
+            
             batch.set(chunk_ref, doc_data)
             stored_count += 1
             
-            # Firestore batch limit is 500
-            if stored_count % 500 == 0:
+            # Commit batch when we reach BATCH_SIZE to avoid transaction size limit
+            if stored_count % BATCH_SIZE == 0:
                 batch.commit()
                 batch = db.batch()
-                logger.info(f"Committed batch of 500 chunks for {filename}")
+                logger.info(f"Committed batch of {BATCH_SIZE} chunks for {filename} (total: {stored_count}/{len(chunks_with_metadata)})")
         
-        # Commit remaining
-        if stored_count % 500 != 0:
+        # Commit remaining chunks
+        if stored_count % BATCH_SIZE != 0:
             batch.commit()
+            logger.info(f"Committed final batch of {stored_count % BATCH_SIZE} chunks for {filename}")
         
         logger.info(f"Successfully stored {stored_count} chunks from {filename}")
+        
+        # Update vectorDB metadata after storing chunks
+        update_vector_db_metadata()
         
         return {
             "success": True,
@@ -318,6 +381,9 @@ def ingest_document(request):
                 logger.info(f"Cleaned up temporary directory: {temp_dir}")
         
         success_count = sum(1 for r in results if r.get("success"))
+        
+        # Update vectorDB metadata after all documents are processed
+        update_vector_db_metadata()
         
         response = jsonify({
             "message": f"Processed {success_count}/{len(results)} documents",

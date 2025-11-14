@@ -64,7 +64,7 @@ export async function generateEmbedding(text, projectId = process.env.GCLOUD_PRO
 /**
  * Generate content using Vertex AI Gemini
  */
-export async function generateContent(prompt, systemInstruction, projectId = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT_ID || 'chumacomply', location = process.env.GCP_LOCATION || 'us-central1', model = 'gemini-2.0-flash-exp') {
+export async function generateContent(prompt, systemInstruction, projectId = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT_ID || 'chumacomply', location = process.env.GCP_LOCATION || 'us-central1', model = 'gemini-2.5-flash') {
     const { GoogleAuth } = await import('google-auth-library');
     const auth = new GoogleAuth({
         scopes: ['https://www.googleapis.com/auth/cloud-platform'],

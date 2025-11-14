@@ -87,7 +87,7 @@ export async function generateContent(
   systemInstruction?: string,
   projectId: string = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT_ID || 'chumacomply',
   location: string = process.env.GCP_LOCATION || 'us-central1',
-  model: string = 'gemini-2.0-flash-exp'
+  model: string = 'gemini-2.5-flash'
 ): Promise<string> {
   const { GoogleAuth } = await import('google-auth-library');
   const auth = new GoogleAuth({

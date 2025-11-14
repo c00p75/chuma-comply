@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useChatStore } from '@/store/chatStore';
+import { trpc } from '@/lib/trpc';
 import { MessageSquare, ClipboardList, Shield } from 'lucide-react';
 
 const starters = [
@@ -22,13 +23,41 @@ const starters = [
 
 export default function PromptStarter() {
   const { profile, user } = useAuth();
-  const { addMessage } = useChatStore();
+  const { addMessage, setLoading, isLoading } = useChatStore((s) => ({
+    addMessage: s.addMessage,
+    setLoading: s.setLoading,
+    isLoading: s.isLoading,
+  }));
 
   async function sendPrompt(text: string) {
-    if (!user) return;
+    if (!user || isLoading) return;
+    
     try {
+      // Add user message
       await addMessage({ role: 'user', content: text }, user.uid);
+      setLoading(true);
+
+      // Call RAG API
+      try {
+        const response = await trpc.rag.getComplianceChecklist.query({ query: text });
+        await addMessage({
+          role: 'bot',
+          content: response.content,
+          sources: response.sources,
+          checklist: (response as any).checklist,
+        }, user.uid);
+      } catch (error: any) {
+        console.error('Failed to get RAG response:', error);
+        await addMessage({
+          role: 'bot',
+          content: error?.message || 'Sorry, I encountered an error while processing your question. Please try again.',
+          sources: [],
+        }, user.uid);
+      } finally {
+        setLoading(false);
+      }
     } catch (error) {
+      setLoading(false);
       // Error already shown by store
     }
   }
@@ -50,7 +79,9 @@ export default function PromptStarter() {
         {starters.map((s, i) => (
           <button
             key={i}
-            className="glass-app-card rounded-2xl p-5 md:p-6 text-left hover:bg-white/90 transition-all focus-ring group"
+            disabled={isLoading}
+            aria-disabled={isLoading}
+            className="glass-app-card rounded-2xl p-5 md:p-6 text-left hover:bg-white/90 transition-all focus-ring group disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => sendPrompt(s.text)}
           >
             <div className="mb-3 text-text-primary">

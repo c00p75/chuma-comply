@@ -6,9 +6,14 @@ export const INTENT_ANALYSIS_PROMPT = `Analyze the following business query and 
 
 Query: "{query}"
 
+IMPORTANT PRIORITY RULES:
+1. If the query mentions "starting", "beginning", "new business", "setting up", "establishing", "launching", or similar phrases about starting a business, you MUST prioritize "business_registration" as the PRIMARY activity and place it FIRST in the activities array.
+2. If the query is about starting a business AND mentions employees/staff, include both "business_registration" (first) and "employment" (second) in activities.
+3. Only include "data_protection" if the query explicitly asks about data privacy, customer data, or data protection compliance - NOT just because employees are mentioned.
+
 Extract the following information:
 - industry: The primary industry or business type (e.g., "food_service", "retail", "manufacturing", "technology", "general")
-- activities: Array of business activities mentioned (e.g., ["employment", "tax", "registration", "licensing"])
+- activities: Array of business activities mentioned. PRIORITIZE business_registration if the query is about starting/beginning a business. Use these exact values: "business_registration", "employment", "tax", "data_protection", "licensing"
 - location: The location mentioned, if any (e.g., "Lusaka", "Kitwe", or "Zambia" for general)
 
 Return ONLY a valid JSON object with this exact structure:
@@ -93,6 +98,12 @@ export function getFinalGenerationPromptJSON(
     })
     .join('\n\n---\n\n');
 
+  // Extract unique valid source names from chunks
+  // Use sourceDocument as primary (always present), actName as fallback for display
+  const validSourceNames = Array.from(new Set(
+    chunks.map(chunk => chunk.sourceDocument || chunk.actName).filter(Boolean)
+  ));
+
   return `Context from legal documents:
 
 ${context}
@@ -100,6 +111,9 @@ ${context}
 ---
 
 User Question: ${query}
+
+CRITICAL: When citing sources in the checklist, you MUST use ONLY these exact source names (do NOT create new names or extract names from content text):
+${validSourceNames.map(name => `- "${name}"`).join('\n')}
 
 Based on the context provided above, generate a structured compliance checklist. Return a JSON object with this exact structure:
 
@@ -122,6 +136,6 @@ Based on the context provided above, generate a structured compliance checklist.
   ]
 }
 
-Extract all compliance steps from the context. Each step should be a distinct requirement. Include all relevant sources for each step. Return ONLY valid JSON, no additional text.`;
+Extract all compliance steps from the context. Each step should be a distinct requirement. For each step's sources array, use ONLY the source names listed above (do NOT create new source names or extract names from the content text). Return ONLY valid JSON, no additional text.`;
 }
 
